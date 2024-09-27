@@ -68,6 +68,10 @@ def is_already_absent(name):
 
 # Fungsi untuk memproses absensi dan menampilkan pesan jika terlambat
 def process_absence(name):
+    if name not in known_face_names:  # Pengecekan jika nama tidak ada dalam dataset
+        st.warning(f'{name} tidak terdaftar dalam dataset. Absensi tidak dapat dilakukan.')
+        return
+
     now = datetime.now()
     time_string = now.strftime('%H:%M:%S')
     date_string = now.strftime('%Y-%m-%d')
@@ -119,7 +123,10 @@ if run:
             
             # Proses absensi jika wajah dikenal dan belum absen hari ini
             if name != "Unknown":
-                process_absence(name)
+                if name in known_face_names:  # Pastikan nama ada dalam dataset
+                    process_absence(name)
+                else:
+                    st.warning(f'{name} tidak terdaftar dalam dataset. Absensi tidak dapat dilakukan.')
         
         FRAME_WINDOW.image(frame, channels='BGR')
 
@@ -131,6 +138,9 @@ else:
 name = st.text_input('Masukkan Nama untuk Absen')
 if st.button('Absen'):
     if name:
-        process_absence(name)
+        if name in known_face_names:  # Pengecekan manual jika nama tidak ada dalam dataset
+            process_absence(name)
+        else:
+            st.warning(f'{name} tidak terdaftar dalam dataset. Absensi tidak dapat dilakukan.')
     else:
         st.warning('Nama harus diisi untuk melakukan absensi.')
